@@ -24,6 +24,11 @@ def main() -> None:
     assert 1 <= len(pitch) <= MAX_CHARS, f"pitch is {len(pitch)} chars"
     assert "\n" not in pitch, "pitch must be exactly one line"
     assert pitch == pitch.strip(), "pitch must not have surrounding whitespace"
+    # The gate reads the file as UTF-8 text: refuse control characters
+    # outright instead of letting one slip into the judged line.
+    assert all(ord(ch) >= 0x20 or ch in "\t" for ch in pitch), (
+        "pitch must not contain control characters"
+    )
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(pitch, encoding="utf-8")
     # Read back what was written: the gate scores the file, not the
